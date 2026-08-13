@@ -15,8 +15,4 @@ public class DealerRequest {
     private String cnpj;
     @NotBlank(message = "CEP is required")
     private String cep;
-    private String street;
-    private String neighborhood;
-    private String city;
-    private String state;
 }
