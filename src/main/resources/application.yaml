@@ -1,10 +1,10 @@
+# Credenciais Postgres
 spring:
   datasource:
     url: ${URL_POSTGRES}
     username: ${USERNAME_POSTGRES}
     password: ${PASSWORD_POSTGRES}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,6 +12,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+# Swagger / OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /docs
 
 server:
   port: 8080

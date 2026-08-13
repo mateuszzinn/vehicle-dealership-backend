@@ -1,5 +1,6 @@
 package com.example.vehicledealershipbackend.controller;
 
+import com.example.vehicledealershipbackend.controller.doc.VehicleControllerDoc;
 import com.example.vehicledealershipbackend.dto.vehicle.VehicleRequest;
 import com.example.vehicledealershipbackend.dto.vehicle.VehicleResponse;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/vehicles")
 @RequiredArgsConstructor
-public class VehicleController {
+public class VehicleController implements VehicleControllerDoc {
 
     private final VehicleService vehicleService;
 

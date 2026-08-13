@@ -1,5 +1,6 @@
 package com.example.vehicledealershipbackend.controller;
 
+import com.example.vehicledealershipbackend.controller.doc.DealerControllerDoc;
 import com.example.vehicledealershipbackend.dto.dealer.DealerRequest;
 import com.example.vehicledealershipbackend.dto.dealer.DealerResponse;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/dealer")
 @RequiredArgsConstructor
-public class DealerController {
+public class DealerController implements DealerControllerDoc {
 
     private final DealerService dealerService;
 
