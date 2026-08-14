@@ -61,6 +61,7 @@ public class VehicleService {
         vehicle.setColor(request.getColor());
         vehicle.setYear(request.getYear());
         vehicle.setChassis(request.getChassis());
+        vehicle.setPrice(request.getPrice());
 
         if (request.getDealerId() != null) {
             Dealer dealer = findDealerById(request.getDealerId());

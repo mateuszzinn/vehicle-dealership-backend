@@ -6,16 +6,12 @@ import com.example.vehicledealershipbackend.entity.Dealer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = VehicleMapper.class)
 public interface DealerMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
     Dealer toEntity(DealerRequest request);
 
-    @Mapping(
-            target = "vehicleIds",
-            expression = "java(dealer.getVehicles() == null ? java.util.List.of() : dealer.getVehicles().stream().map(vehicle -> vehicle.getId()).toList())"
-    )
     DealerResponse toResponse(Dealer dealer);
 }

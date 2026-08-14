@@ -2,6 +2,7 @@ package com.example.vehicledealershipbackend.service;
 
 import com.example.vehicledealershipbackend.dto.dealer.DealerRequest;
 import com.example.vehicledealershipbackend.dto.dealer.DealerResponse;
+import com.example.vehicledealershipbackend.dto.dealer.DealerUpdateRequest;
 import com.example.vehicledealershipbackend.entity.Dealer;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
 import com.example.vehicledealershipbackend.mapper.DealerMapper;
@@ -46,17 +47,16 @@ public class DealerService {
     }
 
     @Transactional
-    public DealerResponse update(Long id, DealerRequest request) throws ResourceNotFoundException {
-
+    public DealerResponse update(Long id, DealerUpdateRequest request) throws ResourceNotFoundException {
         Dealer dealer = findDealerById(id);
 
-        dealer.setCorporateName(request.getCorporateName());
-        dealer.setCnpj(request.getCnpj());
-
-        addressService.fillDealerAddress(dealer, request.getCep());
+        if(request.getCorporateName() != null) {
+            dealer.setCorporateName(request.getCorporateName());
+        } if(request.getCnpj() != null) {
+            dealer.setCnpj(request.getCnpj());
+        }
 
         Dealer updatedDealer = dealerRepository.save(dealer);
-
         return dealerMapper.toResponse(updatedDealer);
     }
 

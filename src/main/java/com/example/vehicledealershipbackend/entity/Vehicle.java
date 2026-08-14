@@ -26,7 +26,7 @@ public class Vehicle {
 
     private Integer year;
     private String chassis;
-    private Integer price;
+    private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dealer_id")

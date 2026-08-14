@@ -19,6 +19,7 @@ public class VehicleRequest {
     private FuelType fuelType;
     @NotBlank(message = "Color is required")
     private String color;
+    private Double price;
     private Integer year;
     private String chassis;
     private Long dealerId;

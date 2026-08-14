@@ -3,6 +3,7 @@ package com.example.vehicledealershipbackend.controller;
 import com.example.vehicledealershipbackend.controller.doc.DealerControllerDoc;
 import com.example.vehicledealershipbackend.dto.dealer.DealerRequest;
 import com.example.vehicledealershipbackend.dto.dealer.DealerResponse;
+import com.example.vehicledealershipbackend.dto.dealer.DealerUpdateRequest;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
 import com.example.vehicledealershipbackend.service.DealerService;
 import jakarta.validation.Valid;
@@ -36,7 +37,7 @@ public class DealerController implements DealerControllerDoc {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DealerResponse> update(@PathVariable Long id, @Valid @RequestBody DealerRequest request) throws ResourceNotFoundException {
+    public ResponseEntity<DealerResponse> update(@PathVariable Long id, @Valid @RequestBody DealerUpdateRequest request) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(dealerService.update(id, request));
     }
 
