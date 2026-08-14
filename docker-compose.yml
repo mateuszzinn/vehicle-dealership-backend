@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: vehicle-dealership-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vehicle_dealership
+      POSTGRES_USER: dealership
+      POSTGRES_PASSWORD: dealership
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vehicle-dealership-app
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      URL_POSTGRES: jdbc:postgresql://postgres:5432/vehicle_dealership
+      USERNAME_POSTGRES: dealership
+      PASSWORD_POSTGRES: dealership
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  postgres_data:
+
+
+
