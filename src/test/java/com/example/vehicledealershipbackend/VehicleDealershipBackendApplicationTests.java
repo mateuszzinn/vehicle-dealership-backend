@@ -8,6 +8,6 @@ class VehicleDealershipBackendApplicationTests {
 
     @Test
     void contextLoads() {
+        VehicleDealershipBackendApplication.main(new String[] {});
     }
-
 }

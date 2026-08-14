@@ -1,9 +1,9 @@
 # Credenciais Postgres
 spring:
   datasource:
-    url: ${URL_POSTGRES:jdbc:postgresql://localhost:5432/vehicle_dealership}
-    username: ${USERNAME_POSTGRES:dealership}
-    password: ${PASSWORD_POSTGRES:dealership}
+    url: ${URL_POSTGRES:jdbc:postgresql://localhost:5432/vehicle-dealership}
+    username: ${USERNAME_POSTGRES:postgres}
+    password: ${PASSWORD_POSTGRES:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
