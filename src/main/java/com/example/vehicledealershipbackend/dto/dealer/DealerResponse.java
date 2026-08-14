@@ -1,5 +1,6 @@
 package com.example.vehicledealershipbackend.dto.dealer;
 
+import com.example.vehicledealershipbackend.dto.vehicle.VehicleResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,5 @@ public class DealerResponse {
     private String neighborhood;
     private String city;
     private String state;
-    private List<Long> vehicleIds;
+    private List<VehicleResponse> vehicles;
 }

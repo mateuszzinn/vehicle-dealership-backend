@@ -2,6 +2,7 @@ package com.example.vehicledealershipbackend.controller.doc;
 
 import com.example.vehicledealershipbackend.dto.dealer.DealerRequest;
 import com.example.vehicledealershipbackend.dto.dealer.DealerResponse;
+import com.example.vehicledealershipbackend.dto.dealer.DealerUpdateRequest;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -82,9 +83,8 @@ public interface DealerControllerDoc {
             )
     })
     ResponseEntity<DealerResponse> update(
-            @PathVariable Long id,
-            @Valid @RequestBody DealerRequest request
-    ) throws ResourceNotFoundException;
+            @PathVariable Long id, @Valid @RequestBody DealerUpdateRequest request)
+            throws ResourceNotFoundException;
 
     @Operation(
             summary = "Delete a dealer",
