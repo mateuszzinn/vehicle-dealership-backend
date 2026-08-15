@@ -4,6 +4,8 @@ import com.example.vehicledealershipbackend.dto.dealer.DealerRequest;
 import com.example.vehicledealershipbackend.dto.dealer.DealerResponse;
 import com.example.vehicledealershipbackend.dto.dealer.DealerUpdateRequest;
 import com.example.vehicledealershipbackend.entity.Dealer;
+import com.example.vehicledealershipbackend.exception.ExternalServiceException;
+import com.example.vehicledealershipbackend.exception.ResourceConflictException;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
 import com.example.vehicledealershipbackend.mapper.DealerMapper;
 import com.example.vehicledealershipbackend.repository.DealerRepository;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +40,13 @@ class DealerServiceTest {
     private DealerService dealerService;
 
     @Test
-    void createShouldFillAddressSaveAndReturnResponse() {
+    void createShouldFillAddressSaveAndReturnResponse() throws ExternalServiceException, ResourceConflictException {
         DealerRequest request = new DealerRequest("Dealer Test", "123", "58400-000");
         Dealer dealer = new Dealer();
         Dealer savedDealer = new Dealer();
         DealerResponse expectedResponse = new DealerResponse();
 
+        when(dealerRepository.existsByCnpj("123")).thenReturn(false);
         when(dealerMapper.toEntity(request)).thenReturn(dealer);
         when(dealerRepository.save(dealer)).thenReturn(savedDealer);
         when(dealerMapper.toResponse(savedDealer)).thenReturn(expectedResponse);
@@ -51,6 +55,27 @@ class DealerServiceTest {
 
         verify(addressService).fillDealerAddress(dealer, "58400-000");
         assertSame(expectedResponse, response);
+    }
+
+    @Test
+    void createShouldThrowWhenCnpjAlreadyExists() {
+        DealerRequest request = new DealerRequest("Dealer Test", "123", "58400-000");
+        when(dealerRepository.existsByCnpj("123")).thenReturn(true);
+
+        assertThrows(ResourceConflictException.class, () -> dealerService.create(request));
+        verify(dealerRepository, never()).save(org.mockito.ArgumentMatchers.any(Dealer.class));
+    }
+
+    @Test
+    void createShouldThrowWhenSaveViolatesUniqueConstraint() throws ExternalServiceException {
+        DealerRequest request = new DealerRequest("Dealer Test", "123", "58400-000");
+        Dealer dealer = new Dealer();
+
+        when(dealerRepository.existsByCnpj("123")).thenReturn(false);
+        when(dealerMapper.toEntity(request)).thenReturn(dealer);
+        when(dealerRepository.save(dealer)).thenThrow(new DataIntegrityViolationException("duplicate"));
+
+        assertThrows(ResourceConflictException.class, () -> dealerService.create(request));
     }
 
     @Test
@@ -97,7 +122,7 @@ class DealerServiceTest {
     }
 
     @Test
-    void updateShouldChangeCorporateNameAndCnpj() throws ResourceNotFoundException {
+    void updateShouldChangeCorporateNameAndCnpj() throws ResourceNotFoundException, ResourceConflictException {
         DealerUpdateRequest request = new DealerUpdateRequest("New Dealer", "999");
         Dealer dealer = new Dealer();
         dealer.setCorporateName("Old Dealer");
@@ -107,6 +132,7 @@ class DealerServiceTest {
         expectedResponse.setCnpj("999");
 
         when(dealerRepository.findById(1L)).thenReturn(Optional.of(dealer));
+        when(dealerRepository.existsByCnpj("999")).thenReturn(false);
         when(dealerRepository.save(dealer)).thenReturn(dealer);
         when(dealerMapper.toResponse(dealer)).thenReturn(expectedResponse);
 
@@ -118,7 +144,7 @@ class DealerServiceTest {
     }
 
     @Test
-    void updateShouldKeepValuesWhenRequestFieldsAreNull() throws ResourceNotFoundException {
+    void updateShouldKeepValuesWhenRequestFieldsAreNull() throws ResourceNotFoundException, ResourceConflictException {
         DealerUpdateRequest request = new DealerUpdateRequest(null, null);
         Dealer dealer = new Dealer();
         dealer.setCorporateName("Current Dealer");
@@ -134,6 +160,32 @@ class DealerServiceTest {
         assertEquals("Current Dealer", dealer.getCorporateName());
         assertEquals("123", dealer.getCnpj());
         assertSame(expectedResponse, response);
+    }
+
+    @Test
+    void updateShouldThrowWhenNewCnpjAlreadyExists() {
+        DealerUpdateRequest request = new DealerUpdateRequest("New Dealer", "999");
+        Dealer dealer = new Dealer();
+        dealer.setCnpj("111");
+
+        when(dealerRepository.findById(1L)).thenReturn(Optional.of(dealer));
+        when(dealerRepository.existsByCnpj("999")).thenReturn(true);
+
+        assertThrows(ResourceConflictException.class, () -> dealerService.update(1L, request));
+        verify(dealerRepository, never()).save(org.mockito.ArgumentMatchers.any(Dealer.class));
+    }
+
+    @Test
+    void updateShouldThrowWhenSaveViolatesUniqueConstraint() {
+        DealerUpdateRequest request = new DealerUpdateRequest("New Dealer", "999");
+        Dealer dealer = new Dealer();
+        dealer.setCnpj("111");
+
+        when(dealerRepository.findById(1L)).thenReturn(Optional.of(dealer));
+        when(dealerRepository.existsByCnpj("999")).thenReturn(false);
+        when(dealerRepository.save(dealer)).thenThrow(new DataIntegrityViolationException("duplicate"));
+
+        assertThrows(ResourceConflictException.class, () -> dealerService.update(1L, request));
     }
 
     @Test

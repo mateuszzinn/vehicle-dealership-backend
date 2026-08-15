@@ -3,6 +3,8 @@ package com.example.vehicledealershipbackend.controller.doc;
 import com.example.vehicledealershipbackend.dto.dealer.DealerRequest;
 import com.example.vehicledealershipbackend.dto.dealer.DealerResponse;
 import com.example.vehicledealershipbackend.dto.dealer.DealerUpdateRequest;
+import com.example.vehicledealershipbackend.exception.ExternalServiceException;
+import com.example.vehicledealershipbackend.exception.ResourceConflictException;
 import com.example.vehicledealershipbackend.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,11 +60,19 @@ public interface DealerControllerDoc {
             @ApiResponse(
                     responseCode = "400",
                     description = "Invalid dealer data"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Dealer already exists for provided CNPJ"
+            ),
+            @ApiResponse(
+                    responseCode = "502",
+                    description = "Failed to fetch dealer address from external service"
             )
     })
     ResponseEntity<DealerResponse> create(
             @Valid @RequestBody DealerRequest request
-    );
+    ) throws ResourceConflictException, ExternalServiceException;
 
     @Operation(
             summary = "Update a dealer",
@@ -80,11 +90,15 @@ public interface DealerControllerDoc {
             @ApiResponse(
                     responseCode = "404",
                     description = "Dealer not found"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Dealer already exists for provided CNPJ"
             )
     })
     ResponseEntity<DealerResponse> update(
             @PathVariable Long id, @Valid @RequestBody DealerUpdateRequest request)
-            throws ResourceNotFoundException;
+            throws ResourceNotFoundException, ResourceConflictException;
 
     @Operation(
             summary = "Delete a dealer",
