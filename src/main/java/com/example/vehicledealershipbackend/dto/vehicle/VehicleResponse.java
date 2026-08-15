@@ -16,5 +16,5 @@ public class VehicleResponse {
     private String color;
     private Integer year;
     private String chassis;
-    private Long dealerId;
+    private String dealerCorporateName;
 }

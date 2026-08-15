@@ -13,6 +13,6 @@ public interface VehicleMapper {
     @Mapping(target = "dealer", ignore = true)
     Vehicle toEntity(VehicleRequest request);
 
-    @Mapping(source = "dealer.id", target = "dealerId")
+    @Mapping(source = "dealer.corporateName", target = "dealerCorporateName")
     VehicleResponse toResponse(Vehicle vehicle);
 }
