@@ -3,6 +3,8 @@ package com.example.vehicledealershipbackend.service;
 import com.example.vehicledealershipbackend.client.ViaCepClient;
 import com.example.vehicledealershipbackend.dto.viacep.ViaCepResponse;
 import com.example.vehicledealershipbackend.entity.Dealer;
+import com.example.vehicledealershipbackend.exception.ExternalServiceException;
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +27,7 @@ class AddressServiceTest {
     private AddressService addressService;
 
     @Test
-    void fillDealerAddressShouldCleanCepAndFillAddressWhenViaCepReturnsValidData() {
+    void fillDealerAddressShouldCleanCepAndFillAddressWhenViaCepReturnsValidData() throws ExternalServiceException {
         Dealer dealer = new Dealer();
         ViaCepResponse response = new ViaCepResponse();
         response.setCep("58400-000");
@@ -44,40 +48,32 @@ class AddressServiceTest {
     }
 
     @Test
-    void fillDealerAddressShouldNotChangeDealerWhenViaCepReturnsNull() {
+    void fillDealerAddressShouldThrowWhenViaCepReturnsNull() {
         Dealer dealer = new Dealer();
-        dealer.setStreet("Old Street");
-        dealer.setNeighborhood("Old Neighborhood");
-        dealer.setCity("Old City");
-        dealer.setState("OS");
 
         when(viaCepClient.getAddressByZipCode("58400000")).thenReturn(null);
 
-        addressService.fillDealerAddress(dealer, "58400-000");
-
-        assertEquals("Old Street", dealer.getStreet());
-        assertEquals("Old Neighborhood", dealer.getNeighborhood());
-        assertEquals("Old City", dealer.getCity());
-        assertEquals("OS", dealer.getState());
+        assertThrows(ExternalServiceException.class, () -> addressService.fillDealerAddress(dealer, "58400-000"));
     }
 
     @Test
-    void fillDealerAddressShouldNotChangeDealerWhenResponseCepIsNull() {
+    void fillDealerAddressShouldThrowWhenResponseCepIsNull() {
         Dealer dealer = new Dealer();
-        dealer.setStreet("Old Street");
-        dealer.setNeighborhood("Old Neighborhood");
-        dealer.setCity("Old City");
-        dealer.setState("OS");
         ViaCepResponse response = new ViaCepResponse();
         response.setCep(null);
 
         when(viaCepClient.getAddressByZipCode("58400000")).thenReturn(response);
 
-        addressService.fillDealerAddress(dealer, "58400-000");
+        assertThrows(ExternalServiceException.class, () -> addressService.fillDealerAddress(dealer, "58400-000"));
+    }
 
-        assertEquals("Old Street", dealer.getStreet());
-        assertEquals("Old Neighborhood", dealer.getNeighborhood());
-        assertEquals("Old City", dealer.getCity());
-        assertEquals("OS", dealer.getState());
+    @Test
+    void fillDealerAddressShouldThrowWhenViaCepClientFails() {
+        Dealer dealer = new Dealer();
+
+        when(viaCepClient.getAddressByZipCode("58400000"))
+                .thenThrow(mock(FeignException.class));
+
+        assertThrows(ExternalServiceException.class, () -> addressService.fillDealerAddress(dealer, "58400-000"));
     }
 }
