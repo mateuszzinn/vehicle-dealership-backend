@@ -54,14 +54,7 @@ public class VehicleService {
     public VehicleResponse update(Long id, VehicleRequest request) throws ResourceNotFoundException {
 
         Vehicle vehicle = findVehicleById(id);
-
-        vehicle.setBrand(request.getBrand());
-        vehicle.setModel(request.getModel());
-        vehicle.setFuelType(request.getFuelType());
-        vehicle.setColor(request.getColor());
-        vehicle.setYear(request.getYear());
-        vehicle.setChassis(request.getChassis());
-        vehicle.setPrice(request.getPrice());
+        vehicleMapper.updateEntityFromRequest(request, vehicle);
 
         if (request.getDealerId() != null) {
             Dealer dealer = findDealerById(request.getDealerId());
@@ -84,10 +77,7 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public List<VehicleResponse> findByDealer(Long dealerId) throws ResourceNotFoundException {
-
-        if (!dealerRepository.existsById(dealerId)) {
-            throw new ResourceNotFoundException("Dealer not found with id: " + dealerId);
-        }
+        findDealerById(dealerId);
 
         return vehicleRepository.findByDealerId(dealerId)
                 .stream()

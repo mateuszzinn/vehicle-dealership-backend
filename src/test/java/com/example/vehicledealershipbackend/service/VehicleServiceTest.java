@@ -146,9 +146,7 @@ class VehicleServiceTest {
 
         VehicleResponse response = vehicleService.update(1L, request);
 
-        assertEquals("Chevrolet", vehicle.getBrand());
-        assertEquals("Onix", vehicle.getModel());
-        assertEquals(98000.00, vehicle.getPrice());
+        verify(vehicleMapper).updateEntityFromRequest(request, vehicle);
         assertNull(vehicle.getDealer());
         assertSame(expectedResponse, response);
     }
@@ -195,7 +193,7 @@ class VehicleServiceTest {
 
     @Test
     void findByDealerShouldThrowWhenDealerDoesNotExist() {
-        when(dealerRepository.existsById(10L)).thenReturn(false);
+        when(dealerRepository.findById(10L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> vehicleService.findByDealer(10L));
         verify(vehicleRepository, never()).findByDealerId(10L);
@@ -207,7 +205,7 @@ class VehicleServiceTest {
         VehicleResponse expectedResponse = new VehicleResponse();
         expectedResponse.setId(1L);
 
-        when(dealerRepository.existsById(10L)).thenReturn(true);
+        when(dealerRepository.findById(10L)).thenReturn(Optional.of(new Dealer()));
         when(vehicleRepository.findByDealerId(10L)).thenReturn(List.of(vehicle));
         when(vehicleMapper.toResponse(vehicle)).thenReturn(expectedResponse);
 
