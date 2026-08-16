@@ -14,6 +14,7 @@ public class VehicleResponse {
     private String model;
     private FuelType fuelType;
     private String color;
+    private Double price;
     private Integer year;
     private String chassis;
     private String dealerCorporateName;
